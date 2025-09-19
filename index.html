@@ -3,11 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ふるさと納税 上限額シミュレーター r2（給与・家族構成から自動計算）</title>
+<title>ふるさと納税 上限額シミュレーター r2.1（給与・家族構成から自動計算｜入力安定化）</title>
 <style>
-  :root{
-    --brand:#3b7e8c; --bg:#f7fafc; --ink:#1f2937; --muted:#6b7280; --card:#fff; --accent:#0ea5e9;
-  }
+  :root{ --brand:#3b7e8c; --bg:#f7fafc; --ink:#1f2937; --muted:#6b7280; --card:#fff; --accent:#0ea5e9; }
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI",sans-serif}
   header{position:sticky;top:0;background:linear-gradient(90deg,var(--brand),#6aa6b5);color:#fff;padding:12px 16px;z-index:10}
   h1{font-size:18px;margin:0}
@@ -18,7 +16,7 @@
   .card h2{font-size:16px;margin:0 0 8px;color:var(--brand)}
   .row{display:grid;grid-template-columns:1fr 220px;gap:8px;align-items:center;margin:6px 0}
   .row label{font-size:14px;color:var(--ink)}
-  .row input[type="number"], .row select{width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:16px}
+  .row input[type="text"], .row input[type="number"], .row select{width:100%;padding:10px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-size:16px}
   .note{grid-column:1 / -1;font-size:12px;color:var(--muted)}
   .muted{color:var(--muted)}
   .pill{display:inline-block;background:#eef6fa;color:#0b5b74;border-radius:999px;padding:2px 10px;font-size:12px;margin-left:6px}
@@ -38,7 +36,7 @@
 </head>
 <body>
 <header>
-  <h1>ふるさと納税 上限額シミュレーター <span class="pill">r2</span> <span class="pill">給与・家族構成から自動</span></h1>
+  <h1>ふるさと納税 上限額シミュレーター <span class="pill">r2.1</span> <span class="pill">給与・家族構成から自動</span></h1>
 </header>
 <div class="wrap grid grid-cols-2">
   <section class="card">
@@ -51,63 +49,63 @@
       </select>
     </div>
     <div class="two">
-      <div class="row"><label>給与収入（年額）</label><input id="salaryIncome" type="number" inputmode="decimal" placeholder="例: 6,000,000"></div>
-      <div class="row"><label>社会保険料控除額（年額）</label><input id="socIns" type="number" inputmode="decimal" placeholder="例: 900,000"></div>
+      <div class="row"><label>給与収入（年額）</label><input id="salaryIncome" type="text" inputmode="numeric" placeholder="例: 6,000,000"></div>
+      <div class="row"><label>社会保険料控除額（年額）</label><input id="socIns" type="text" inputmode="numeric" placeholder="例: 900,000"></div>
     </div>
     <div class="two">
       <div class="row"><label>配偶者の有無</label>
         <select id="hasSpouse"><option value="no">いない</option><option value="yes">いる</option></select>
       </div>
-      <div class="row"><label>配偶者の所得（見積）</label><input id="spouseIncome" type="number" inputmode="decimal" value="0"></div>
+      <div class="row"><label>配偶者の所得（見積）</label><input id="spouseIncome" type="text" inputmode="numeric" value="0"></div>
     </div>
     <div class="two">
-      <div class="row"><label>扶養親族（一般）人</label><input id="depGeneral" type="number" value="0"></div>
-      <div class="row"><label>扶養親族（特定19〜22歳）人</label><input id="depSpecial" type="number" value="0"></div>
+      <div class="row"><label>扶養親族（一般）人</label><input id="depGeneral" type="number" value="0" min="0" step="1"></div>
+      <div class="row"><label>扶養親族（特定19〜22歳）人</label><input id="depSpecial" type="number" value="0" min="0" step="1"></div>
     </div>
     <div class="two">
-      <div class="row"><label>扶養親族（老人70歳以上）人</label><input id="depElder" type="number" value="0"></div>
-      <div class="row"><label>同居老親等（70歳以上）人</label><input id="depCoresidentElder" type="number" value="0"></div>
+      <div class="row"><label>扶養親族（老人70歳以上）人</label><input id="depElder" type="number" value="0" min="0" step="1"></div>
+      <div class="row"><label>同居老親等（70歳以上）人</label><input id="depCoresidentElder" type="number" value="0" min="0" step="1"></div>
     </div>
     <div class="row">
       <label>その他の所得控除（国税用合計）<br><span class="muted">生命保険料控除、小規模企業共済等、医療費控除等の合計（概算可）</span></label>
-      <input id="otherDedNat" type="number" inputmode="decimal" value="0">
+      <input id="otherDedNat" type="text" inputmode="numeric" value="0">
     </div>
     <div class="row">
       <label>その他の所得控除（住民税用合計）<br><span class="muted">住民税の生命保険料控除等（国税と金額が異なる場合）</span></label>
-      <input id="otherDedRes" type="number" inputmode="decimal" value="0">
+      <input id="otherDedRes" type="text" inputmode="numeric" value="0">
     </div>
-    <div class="warn">配偶者控除・配偶者特別控除は「配偶者の所得」から簡易判定します（所得税の合計所得金額1,000万円超等の制限は本試算では考慮外）。実務判断は年末調整・確定申告資料で最終確認してください。</div>
+    <div class="warn">入力中に<strong>3桁区切り</strong>を付けてもリセットされないよう修正しました（<code>type="text"</code>＋<code>inputmode="numeric"</code>）。</div>
   </section>
 
   <section class="card">
     <h2>② その他の所得（任意）</h2>
     <p class="muted" style="margin-top:0">入力が無ければ0として計算します。金額は<strong>所得金額</strong>ベース。</p>
     <div class="two">
-      <div class="row"><label>事業所得</label><input id="s_business" type="number" value="0"></div>
-      <div class="row"><label>不動産所得</label><input id="s_real" type="number" value="0"></div>
+      <div class="row"><label>事業所得</label><input id="s_business" type="text" inputmode="numeric" value="0"></div>
+      <div class="row"><label>不動産所得</label><input id="s_real" type="text" inputmode="numeric" value="0"></div>
     </div>
     <div class="two">
-      <div class="row"><label>雑所得（年金・その他/総合）</label><input id="s_misc" type="number" value="0"></div>
-      <div class="row"><label>配当（総合課税分）</label><input id="s_div" type="number" value="0"></div>
+      <div class="row"><label>雑所得（年金・その他/総合）</label><input id="s_misc" type="text" inputmode="numeric" value="0"></div>
+      <div class="row"><label>配当（総合課税分）</label><input id="s_div" type="text" inputmode="numeric" value="0"></div>
     </div>
     <div class="two">
-      <div class="row"><label>短期譲渡（総合課税）</label><input id="s_stcg_comp" type="number" value="0"></div>
-      <div class="row"><label>長期譲渡（総合課税）</label><input id="s_ltcg_comp" type="number" value="0"></div>
+      <div class="row"><label>短期譲渡（総合課税）</label><input id="s_stcg_comp" type="text" inputmode="numeric" value="0"></div>
+      <div class="row"><label>長期譲渡（総合課税）</label><input id="s_ltcg_comp" type="text" inputmode="numeric" value="0"></div>
     </div>
     <div class="two">
-      <div class="row"><label>一時所得 総収入</label><input id="s_ichiji_gross" type="number" value="0"></div>
-      <div class="row"><label>一時所得 必要経費</label><input id="s_ichiji_cost" type="number" value="0"></div>
+      <div class="row"><label>一時所得 総収入</label><input id="s_ichiji_gross" type="text" inputmode="numeric" value="0"></div>
+      <div class="row"><label>一時所得 必要経費</label><input id="s_ichiji_cost" type="text" inputmode="numeric" value="0"></div>
     </div>
     <div class="two">
-      <div class="row"><label>退職所得金額</label><input id="s_retire" type="number" value="0"></div>
-      <div class="row"><label>山林所得金額</label><input id="s_forest" type="number" value="0"></div>
+      <div class="row"><label>退職所得金額</label><input id="s_retire" type="text" inputmode="numeric" value="0"></div>
+      <div class="row"><label>山林所得金額</label><input id="s_forest" type="text" inputmode="numeric" value="0"></div>
     </div>
     <hr style="border:none;border-top:1px solid #e5e7eb;margin:10px 0" />
-    <div class="row"><label>上場株式等の譲渡/配当（<strong>申告分離</strong>）</label><input id="s_sep_stock" type="number" value="0"></div>
-    <div class="row"><label>土地建物の譲渡（短期・分離）<br><span class="muted">特別控除前</span></label><input id="s_sep_land_st" type="number" value="0"></div>
-    <div class="row"><label>土地建物の譲渡（長期・分離）<br><span class="muted">特別控除前</span></label><input id="s_sep_land_lt" type="number" value="0"></div>
-    <div class="row"><label>先物等の分離課税</label><input id="s_sep_other" type="number" value="0"></div>
-    <div class="row"><label>繰越控除による調整（純損失・雑損失 等）<br><span class="muted">該当時は<strong>マイナス</strong>で入力</span></label><input id="s_carry" type="number" value="0"></div>
+    <div class="row"><label>上場株式等の譲渡/配当（<strong>申告分離</strong>）</label><input id="s_sep_stock" type="text" inputmode="numeric" value="0"></div>
+    <div class="row"><label>土地建物の譲渡（短期・分離）<br><span class="muted">特別控除前</span></label><input id="s_sep_land_st" type="text" inputmode="numeric" value="0"></div>
+    <div class="row"><label>土地建物の譲渡（長期・分離）<br><span class="muted">特別控除前</span></label><input id="s_sep_land_lt" type="text" inputmode="numeric" value="0"></div>
+    <div class="row"><label>先物等の分離課税</label><input id="s_sep_other" type="text" inputmode="numeric" value="0"></div>
+    <div class="row"><label>繰越控除による調整（純損失・雑損失 等）<br><span class="muted">該当時は<strong>マイナス</strong>で入力</span></label><input id="s_carry" type="text" inputmode="numeric" value="0"></div>
   </section>
 
   <section class="card">
@@ -120,7 +118,7 @@
       <div class="row"><label>（自動）所得税の限界税率</label><div class="mono" id="nat_rate">—</div></div>
       <div class="row"><label>（自動）住民税の所得割額（調整控除後）</label><div class="mono" id="ju_after_adj">—</div></div>
     </div>
-    <div class="row"><label>自己負担（通常2,000円）</label><input id="selfBurden" type="number" value="2000"></div>
+    <div class="row"><label>自己負担（通常2,000円）</label><input id="selfBurden" type="text" inputmode="numeric" value="2000"></div>
     <div class="ok" id="quickMsg">数字を入れると自動で計算します。</div>
     <div class="row">
       <label>自己負担を<span class="pill">{2,000円}</span>に抑えられる推定上限</label>
@@ -153,27 +151,57 @@
   </section>
 
   <footer class="wrap" style="grid-column:1 / -1;">
-    © Matsumoto Kaikei / furusato-limit r2 — 本ツールは試算用です。最終判断は関係法令・自治体公表資料をご確認ください。
+    © Matsumoto Kaikei / furusato-limit r2.1 — 本ツールは試算用です。最終判断は関係法令・自治体公表資料をご確認ください。
   </footer>
 </div>
 
 <script>
 const jp = new Intl.NumberFormat('ja-JP');
 const fmt = (n)=> isFinite(n) ? '¥'+jp.format(Math.floor(n)) : '—';
-const num = (id)=>{ const v = parseFloat((document.getElementById(id).value||'').toString().replace(/,/g,'')); return isNaN(v)?0:v; }
+const num = (id)=>{ const v = (document.getElementById(id).value||'').toString().replace(/,/g,''); const f=parseFloat(v); return isNaN(f)?0:f; }
 const setText = (id, t)=>{ document.getElementById(id).textContent = t }
 
-// auto comma
-['salaryIncome','socIns','spouseIncome','otherDedNat','otherDedRes','selfBurden','s_business','s_real','s_misc','s_div','s_stcg_comp','s_ltcg_comp','s_ichiji_gross','s_ichiji_cost','s_retire','s_forest','s_sep_stock','s_sep_land_st','s_sep_land_lt','s_sep_other','s_carry','depGeneral','depSpecial','depElder','depCoresidentElder']
-.forEach(id=>{ const el=document.getElementById(id); if(!el) return; el.addEventListener('input',()=>{ const raw=el.value.replace(/,/g,''); if(raw===''||isNaN(Number(raw))) return; el.value=Number(raw).toLocaleString('ja-JP'); computeAll(); }); });
-['year','hasSpouse'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('change', computeAll); });
+// 入力: 金額系は type=text + inputmode で3桁区切りしつつ、キャレット位置を維持（負号も許容）
+function bindComma(id){
+  const el = document.getElementById(id); if(!el) return;
+  el.addEventListener('input',()=>{
+    const val = el.value;
+    if(val==='-'){ return; } // 単独マイナスは入力継続を許容
+    const sel = el.selectionStart ?? val.length;
+    const digitsBefore = val.slice(0, sel).replace(/\D/g,'').length;
+    const neg = /^\s*-/.test(val);
+    const rawDigits = val.replace(/\D/g,'');
+    if(rawDigits===''){ el.value = neg? '-' : ''; computeAll(); return; }
+    let formatted = Number(rawDigits).toLocaleString('ja-JP');
+    if(neg && formatted!=='0'){ formatted = '-' + formatted; }
+    el.value = formatted;
+    // 桁数ベースでキャレット復元（負号は除外してカウント）
+    let count=0, pos=formatted.length;
+    for(let i=0;i<formatted.length;i++){
+      if(/\d/.test(formatted[i])) count++;
+      if(count===digitsBefore){ pos=i+1; break; }
+    }
+    if(neg) pos = Math.min(pos+1, formatted.length);
+    try{ el.setSelectionRange(pos,pos); }catch{}
+    computeAll();
+  });
+}
+[
+ 'salaryIncome','socIns','spouseIncome','otherDedNat','otherDedRes','selfBurden',
+ 's_business','s_real','s_misc','s_div','s_stcg_comp','s_ltcg_comp',
+ 's_ichiji_gross','s_ichiji_cost','s_retire','s_forest',
+ 's_sep_stock','s_sep_land_st','s_sep_land_lt','s_sep_other','s_carry'
+].forEach(bindComma);
+
+document.getElementById('btnReset').addEventListener('click', ()=>{ location.reload(); });
+['year','hasSpouse','depGeneral','depSpecial','depElder','depCoresidentElder']
+  .forEach(id=>{ const el=document.getElementById(id); el.addEventListener('change', computeAll); });
 
 // 給与所得控除（年額）
 function salaryDeduction(y, amount, taxKind){
-  // y: 所得税年分（2024/2025）、taxKind: 'nat' or 'res'（住民税は y+1 年度課税相当）
   const a = Math.max(0, amount);
   const min65StartNat = (y>=2025);
-  const min65StartRes = (y>=2025); // 2025年収→2026年度住民税で65万円
+  const min65StartRes = (y>=2025);
   const use65 = (taxKind==='nat') ? min65StartNat : min65StartRes;
   const minBase = use65 ? 650000 : 550000;
   if(a<=1625000) return minBase;
@@ -184,21 +212,18 @@ function salaryDeduction(y, amount, taxKind){
   return 1950000; // 上限
 }
 
-// 所得税の基礎控除（令和7・8年分特例対応）
 function basicDeductionNat(y, so){
-  // 合計所得金額 so
   const s = Math.max(0, Math.floor(so));
   if(y>=2025){
     if(s<=1320000) return 950000;
     if(s<=3360000) return 880000;
     if(s<=4890000) return 680000;
     if(s<=6550000) return 630000;
-    if(s<=23500000) return 580000; // 経過措置の説明に従う
+    if(s<=23500000) return 580000;
     if(s<=24500000) return 320000;
     if(s<=25000000) return 160000;
     return 0;
   } else {
-    // 2024年分以前（従前）
     if(s<=24000000) return 480000;
     if(s<=24500000) return 320000;
     if(s<=25000000) return 160000;
@@ -206,7 +231,6 @@ function basicDeductionNat(y, so){
   }
 }
 
-// 住民税の基礎控除
 function basicDeductionRes(so){
   const s=Math.max(0, Math.floor(so));
   if(s<=24000000) return 430000;
@@ -215,18 +239,15 @@ function basicDeductionRes(so){
   return 0;
 }
 
-// 扶養控除・配偶者控除（簡易）
 const DED_NAT = { spouse:380000, depGeneral:380000, depSpecial:630000, depElder:480000, depCoresidentElder:580000 };
 const DED_RES = { spouse:330000, depGeneral:330000, depSpecial:450000, depElder:380000, depCoresidentElder:450000 };
 
 function spouseDeduction(y, spouseIncome, soOwn, kind){
-  // 簡易判定：配偶者の合計所得金額が（2025年分以後）58万円以下なら控除適用とする。本人1,000万円超の所得制限等は未考慮。
   const thr = (y>=2025)? 580000 : 480000;
   if(spouseIncome<=thr){ return kind==='nat'? DED_NAT.spouse : DED_RES.spouse; }
-  return 0; // 配偶者特別控除は未実装（要望で拡張可）
+  return 0; // 配偶者特別控除は簡易化（追加実装可）
 }
 
-// 所得税の速算表（No.2260）
 const BRACKETS = [
   {up:1949000, rate:0.05, quick:0},
   {up:3299000, rate:0.10, quick:97500},
@@ -243,16 +264,15 @@ function natRateAndTax(taxable){
 }
 
 function computeSO(){
-  // 総所得金額等
   const y = parseInt(document.getElementById('year').value,10);
   const sal = num('salaryIncome');
   const salDedNat = salaryDeduction(y, sal, 'nat');
-  const salIncome = Math.max(0, sal - salDedNat); // 給与所得（国税基準）
+  const salIncome = Math.max(0, sal - salDedNat);
 
   const s1 = salIncome + num('s_business') + num('s_real') + num('s_misc') + num('s_div') + num('s_stcg_comp');
   const ltcgComp = num('s_ltcg_comp');
   const ichijiBase = Math.max(num('s_ichiji_gross') - num('s_ichiji_cost') - 500000, 0);
-  const halfGroup = (ltcgComp + ichijiBase) / 2; // 長期譲渡（総合）＋一時の合計の1/2
+  const halfGroup = (ltcgComp + ichijiBase) / 2; 
   const retire = num('s_retire');
   const forest = num('s_forest');
   const sep = num('s_sep_stock') + num('s_sep_land_st') + num('s_sep_land_lt') + num('s_sep_other');
@@ -261,7 +281,6 @@ function computeSO(){
 }
 
 function peopleDeductions(kind, y, soOwn){
-  // kind: 'nat' or 'res'
   const depG = Math.max(0, parseInt(document.getElementById('depGeneral').value||'0',10));
   const depS = Math.max(0, parseInt(document.getElementById('depSpecial').value||'0',10));
   const depE = Math.max(0, parseInt(document.getElementById('depElder').value||'0',10));
@@ -281,7 +300,6 @@ function computeAll(){
   const so = computeSO();
   setText('so_auto', so? fmt(so):'—');
 
-  // 所得控除（国税/住民税）
   const socIns = num('socIns');
   const otherNat = num('otherDedNat');
   const otherRes = num('otherDedRes');
@@ -289,32 +307,23 @@ function computeAll(){
   const pdNat = peopleDeductions('nat', y, so);
   const pdRes = peopleDeductions('res', y, so);
 
-  // 給与所得（住民税基準）—住民税の給与控除は y+1で判断
   const sal = num('salaryIncome');
   const salDedRes = salaryDeduction(y, sal, 'res');
   const salaryIncomeRes = Math.max(0, sal - salDedRes);
 
-  // 所得税の課税所得（概算）
-  const natIncomeSum = (so // ここでは総所得金額等 ≒ 総合課税等の合計だが、課税所得算定の近似として使用
-    - (num('s_sep_stock') + num('s_sep_land_st') + num('s_sep_land_lt') + num('s_sep_other')) // 分離課税は除外のつもりで二重差引防止
-  );
+  const natIncomeSum = (so - (num('s_sep_stock') + num('s_sep_land_st') + num('s_sep_land_lt') + num('s_sep_other')));
   const taxableNat = Math.max(0, Math.floor(natIncomeSum - (pdNat.total + socIns + otherNat)));
   setText('taxable_nat', taxableNat? fmt(taxableNat):'—');
 
-  const {rate, quick} = natRateAndTax(taxableNat);
+  const {rate} = natRateAndTax(taxableNat);
   setText('nat_rate', `${Math.round(rate*100)}%`);
-  const natEff = rate * 1.021; // 復興特別所得税を乗算（概算）
+  const natEff = rate * 1.021;
 
-  // 住民税の課税標準（合計課税所得金額 相当）
-  // 住民税の課税所得 ≒ （給与所得（住民）＋その他総合の所得） − （人的控除（住民）＋社保＋住民用その他控除）
-  // ここでは so から分離課税等を引き、給与所得だけは住民税基準に差し替える簡易処理
   const soWithoutSalaryNatPart = so - Math.max(0, (num('salaryIncome') - salaryDeduction(y, num('salaryIncome'), 'nat')));
   const sumResBase = Math.max(0, salaryIncomeRes + (soWithoutSalaryNatPart));
   const taxableRes = Math.max(0, Math.floor(sumResBase - (pdRes.total + socIns + otherRes)));
 
-  // 調整控除の計算
-  const peopleDiff = (pdNat.base - pdRes.base)
-                   + (pdNat.sp - pdRes.sp)
+  const peopleDiff = (pdNat.base - pdRes.base) + (pdNat.sp - pdRes.sp)
                    + (pdNat.depG - 0)* (DED_NAT.depGeneral - DED_RES.depGeneral)
                    + (pdNat.depS - 0)* (DED_NAT.depSpecial - DED_RES.depSpecial)
                    + (pdNat.depE - 0)* (DED_NAT.depElder - DED_RES.depElder)
@@ -326,15 +335,14 @@ function computeAll(){
     const u = peopleDiff - (taxableRes - 2000000);
     const e = 50000;
     adj = Math.max(u, e) * 0.05;
-    if(adj<0) adj = e * 0.05; // 念のため
+    if(adj<0) adj = e * 0.05;
   } else {
     adj = 0;
   }
 
-  const juIncomeLevy = Math.max(0, Math.floor(taxableRes*0.10 - adj)); // 調整控除後の所得割額（税額控除は未反映）
+  const juIncomeLevy = Math.max(0, Math.floor(taxableRes*0.10 - adj));
   setText('ju_after_adj', juIncomeLevy? fmt(juIncomeLevy):'—');
 
-  // 上限計算
   const selfBurden = num('selfBurden') || 2000;
   const denom = (0.90 - natEff);
   const d1 = denom>0 ? Math.floor(juIncomeLevy * 0.20 / denom + selfBurden) : Infinity;
@@ -344,7 +352,6 @@ function computeAll(){
   setText('maxDonation', dmax? fmt(dmax) : '—');
   setText('limitBreakdown', `20%上限式: ${fmt(d1)} / 総所得金額等×30%: ${fmt(cap30)} / ×40%: ${fmt(cap40)}`);
 
-  // 内訳（概算）
   const incomeTaxPart = Math.max(0, Math.floor((Math.min(dmax, cap40) - selfBurden) * natEff));
   const resBasicPart  = Math.max(0, Math.floor((Math.min(dmax, cap30) - selfBurden) * 0.10));
   const resSpecCap    = Math.floor(juIncomeLevy * 0.20);
